@@ -1,7 +1,15 @@
 FROM    ubuntu:14.04 
 MAINTAINER Yannick Saint Martino
 
-RUN apt-get update -y && apt-get install -y wget libglib2.0-dev libx11-dev libgtk2.0-0
+RUN mkdir -p /usr/share/icons/hicolor/16x16/apps/
+RUN mkdir -p /usr/share/icons/hicolor/32x32/apps/
+RUN mkdir -p /usr/share/icons/hicolor/48x48/apps/
+RUN mkdir -p /usr/share/icons/hicolor/128x128/apps/
+RUN mkdir -p /usr/share/icons/hicolor/256x256/apps/
+
+RUN apt-get update && apt-get install -y software-properties-common python-software-properties
+RUN add-apt-repository ppa:webupd8team/sublime-text-2 && apt-get update && apt-get install -y sublime-text && apt-get install -y libglib2.0-dev libx11-dev libgtk2.0-0
+RUN rm -rf /var/lib/apt/lists/*
 
 # Set locale to UTF8
 RUN locale-gen --no-purge en_US.UTF-8
@@ -20,22 +28,16 @@ RUN export uid=1000 gid=1000 && \
     chmod 0440 /etc/sudoers.d/sublimeuser && \
     chown ${uid}:${gid} -R /home/sublimeuser
 
-RUN cd /home/sublimeuser/ 
-RUN        wget http://c758482.r82.cf2.rackcdn.com/sublime_text_3_build_3047_x64.tar.bz2 
-RUN        tar vxjf sublime_text_3_build_3047_x64.tar.bz2 
-RUN        rm sublime_text_3_build_3047_x64.tar.bz2 
-RUN	mv sublime_text_3 /opt/ 
-RUN	ln -s /opt/sublime_text_3/sublime_text /usr/bin/sublime
-
-RUN mkdir -p '/home/sublimeuser/.config/sublime-text-3/Packages'
-RUN mkdir -p '/home/sublimeuser/.config/sublime-text-3/Installed Packages' && cd '/home/sublimeuser/.config/sublime-text-3/Installed Packages'
+RUN mkdir -p '/home/sublimeuser/.config/sublime-text-2/Packages'
+RUN mkdir -p '/home/sublimeuser/.config/sublime-text-2/Installed Packages' && cd '/home/sublimeuser/.config/sublime-text-2/Installed Packages'
 RUN wget https://sublime.wbond.net/Package%20Control.sublime-package
-RUN mv 'Package Control.sublime-package' '/home/sublimeuser/.config/sublime-text-3/Installed Packages/'
+RUN mv 'Package Control.sublime-package' '/home/sublimeuser/.config/sublime-text-2/Installed Packages/'
 
+RUN chmod 777 -R /home/sublimeuser
 
 # share workspace directory
 VOLUME ["/workspace"]
 
 # launch
 USER sublimeuser
-CMD sublime
+CMD sublime-text
